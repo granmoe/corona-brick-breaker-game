@@ -10,7 +10,7 @@ local ch, cw, cx, cy =
 function scene:create(event)
 	local sceneGroup = self.view
 
-	-- TODO: Simple background for menu...more exciting one for game
+	-- TODO: Use random photo for each scene...extract to shared util
 	local bg =
 		display.newImageRect(sceneGroup, "scenes/menu/background.jpg", cw, ch)
 	bg.x = cx

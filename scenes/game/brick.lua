@@ -1,44 +1,40 @@
-local lg = love.graphics
-
 local Brick = {}
-
-function Brick:draw()
-	lg.setColor(
-		self.r / 255,
-		self.g / 255,
-		self.b / 255,
-		(255 * (self.health / 100)) / 255
-	)
-	lg.rectangle("fill", self.x, self.y, self.width, self.height)
-end
 
 function Brick:takeDamage()
 	self.health = self.health - 50
 	if self.health <= 0 then
 		self:destroy()
 	end
+
+	self.fill.effect = "generator.checkerboard"
+	self.fill.effect.color1 = { 0, 0, 0, 0 }
+	self.fill.effect.color2 = { 1, 0.5, 0.5, 1 }
+	self.fill.effect.xStep = 40
+	self.fill.effect.yStep = 15
 end
 
 function Brick:destroy()
 	display.remove(self)
-	-- self = nil
+	-- self = nil -- would this cause a crash?
 end
 
-local function createBrick(x, y, width, height, index, bricks, world)
-	local brick = {
-		x = x,
-		y = y,
-		health = 100,
-		r = math.floor(math.random() * 256),
-		g = math.floor(math.random() * 256),
-		b = math.floor(math.random() * 256),
-		isBrick = true,
-		index = index,
-		bricks = bricks,
-		world = world,
-		width = width,
-		height = height
-	}
+local function createBrick(group, x, y, width, height)
+	-- last arg is border radius
+	local brick = display.newRect(group, x, y, width, height)
+	local r, b, g =
+		math.random(1, 100) / 100,
+		math.random(1, 100) / 100,
+		math.random(1, 100) / 100
+
+	brick:setFillColor(r, b, g)
+	brick.fill.effect = "generator.radialGradient"
+	brick.fill.effect.color1 = { 1, 1, 1, 1 }
+	brick.fill.effect.color2 = { 0, 0, 0, 1 }
+	brick.fill.effect.center_and_radiuses = { 0.5, 0.5, 0.2, 0.8 }
+	brick.fill.effect.aspectRatio = 0.1
+
+	brick.health = 100
+	brick.type = "brick"
 
 	setmetatable(brick, { __index = Brick })
 

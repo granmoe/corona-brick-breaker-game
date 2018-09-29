@@ -1,5 +1,6 @@
 local composer = require("composer")
 local scene = composer.newScene()
+local createBrick = require("scenes.game.brick")
 
 local physics = require("physics")
 physics.start()
@@ -56,16 +57,26 @@ function scene:create(event)
 	bg.fill.effect = "filter.crystallize"
 	bg.fill.effect.numTiles = 140
 
-	-- local paddle = display.newRect(mainGroup, 98, 79)
-	-- paddle.x = display.contentCenterX
-	-- paddle.y = display.contentHeight - 100
-	-- physics.addBody(paddle, {
-	-- 	radius = 30,
-	-- 	isSensor = true
-	-- })
-	-- paddle.myName = "paddle"
+	local width = cw / 6
+	local height = 20
+	local startX = width / 2
+	local startY = 30
+	for row = 0, 2 do
+		for col = 0, 5 do
+			local x = startX + col * width
+			local y = startY + row * height
+			createBrick(mainGroup, x, y, width, height)
+		end
+	end
 
-	-- paddle:addEventListener("touch", dragPaddle)
+	local paddle = display.newRect(mainGroup, cx, ch - 30, 100, 10)
+	physics.addBody(paddle, {
+		radius = 30,
+		isSensor = true
+	})
+	paddle.type = "paddle"
+
+	paddle:addEventListener("touch", dragPaddle)
 end
 
 function scene:show(event)
