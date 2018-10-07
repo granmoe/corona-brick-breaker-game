@@ -1,6 +1,7 @@
 local composer = require("composer")
 local scene = composer.newScene()
 local createBrick = require("scenes.game.brick")
+local createPaddle = require("scenes.game.paddle")
 
 local physics = require("physics")
 physics.start()
@@ -12,35 +13,6 @@ local ch, cw, cx, cy =
 	display.contentCenterX,
 	display.contentCenterY
 
--- TODO: Sound FX when hit brick, paddle, break brick, win, start new game
--- TODO: Use this to drag paddle
-local function dragPaddle(event)
-	local paddle = event.target
-
-	if ("began" == event.phase) then
-		display.currentStage:setFocus(paddle)
-		paddle.touchOffsetX = event.x - paddle.x
-	-- Set touch focus on the paddle
-	-- Store initial offset position
-	elseif ("moved" == event.phase) then
-		-- Move the paddle to the new touch position
-		paddle.x = event.x - paddle.touchOffsetX
-	elseif ("ended" == event.phase or "cancelled" == event.phase) then
-		-- Release touch focus on the paddle
-		display.currentStage:setFocus(nil)
-	end
-
-	return true -- Prevents touch propagation to underlying objects
-end
-
-local function onCollision(event)
-	if (event.phase == "began") then
-		local obj1 = event.object1
-		local obj2 = event.object2
-		-- TODO: Lose life, restore paddle/ball, end game
-	end
-end
-
 function scene:create(event)
 	local sceneGroup = self.view
 
@@ -50,13 +22,13 @@ function scene:create(event)
 	sceneGroup:insert(backGroup)
 	sceneGroup:insert(mainGroup)
 
-	local bg =
+	local background =
 		display.newImageRect(backGroup, "scenes/game/background.jpg", cw, ch)
-	bg.x = cx
-	bg.y = cy
-	bg.fill.effect = "filter.crystallize"
-	bg.fill.effect.numTiles = 140
-
+	background.x = cx
+	background.y = cy
+	background.fill.effect = "filter.crystallize"
+	background.fill.effect.numTiles = 90 -- 140
+	-- Add bricks
 	local width = cw / 6
 	local height = 20
 	local startX = width / 2
@@ -69,27 +41,33 @@ function scene:create(event)
 		end
 	end
 
-	local paddle = display.newRect(mainGroup, cx, ch - 30, 100, 10)
-	physics.addBody(paddle, {
-		radius = 30,
-		isSensor = true
-	})
-	paddle.type = "paddle"
+	createPaddle(mainGroup)
 
-	paddle:addEventListener("touch", dragPaddle)
+	local ball = display.newCircle(mainGroup, cx, cy, 13)
+	ball:setFillColor(1, 1, 1)
+	ball.fill.effect = "generator.radialGradient"
+	ball.fill.effect.color1 = { 1, 1, 1, 1 }
+	ball.fill.effect.color2 = { 0, 0, 0, 1 }
+	ball.fill.effect.center_and_radiuses = { 0.5, 0.5, 0, 1 }
+	ball.fill.effect.aspectRatio = 1
+
+	physics.addBody(ball, {
+		radius = 13,
+		density = 1,
+		friction = 0.5,
+		bounce = 1
+	})
+	ball:setLinearVelocity(0, 200)
 end
 
 function scene:show(event)
-	print(composer.getSceneName())
 	if (event.phase == "did") then
 		physics.start()
-		-- Runtime:addEventListener("collision", onCollision)
 	end
 end
 
 function scene:hide(event)
 	if (event.phase == "did") then
-		Runtime:removeEventListener("collision", onCollision)
 		physics.pause()
 		composer.removeScene("game")
 	end

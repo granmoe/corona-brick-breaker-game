@@ -1,3 +1,5 @@
+local physics = require("physics")
+
 local Brick = {}
 
 function Brick:takeDamage()
@@ -15,6 +17,7 @@ end
 
 function Brick:destroy()
 	display.remove(self)
+	-- sometimes need to use self:removeSelf() depending on object type (text)
 	-- self = nil -- would this cause a crash?
 end
 
@@ -35,6 +38,7 @@ local function createBrick(group, x, y, width, height)
 
 	brick.health = 100
 	brick.type = "brick"
+	physics.addBody(brick, "static")
 
 	setmetatable(brick, { __index = Brick })
 
