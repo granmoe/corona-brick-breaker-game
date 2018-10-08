@@ -1,24 +1,25 @@
 local physics = require("physics")
 
-local Brick = {}
+function onCollision(event)
+	local self = event.target
 
-function Brick:takeDamage()
-	self.health = self.health - 50
-	if self.health <= 0 then
-		self:destroy()
+	if event.phase == "began" then
+		self.health = self.health - 50
+
+		if self.health <= 0 then
+			-- self:removeEventListener("collision") -- why isn't this working? Do in a lifecycle hook?
+			display.remove(self)
+			return
+			-- sometimes need to use self:removeSelf() depending on object type (text)
+			-- self = nil -- would this cause a crash?
+		end
+
+		self.fill.effect = "generator.checkerboard"
+		self.fill.effect.color1 = { 0, 0, 0, 0 }
+		self.fill.effect.color2 = { 1, 0.5, 0.5, 1 }
+		self.fill.effect.xStep = 40
+		self.fill.effect.yStep = 15
 	end
-
-	self.fill.effect = "generator.checkerboard"
-	self.fill.effect.color1 = { 0, 0, 0, 0 }
-	self.fill.effect.color2 = { 1, 0.5, 0.5, 1 }
-	self.fill.effect.xStep = 40
-	self.fill.effect.yStep = 15
-end
-
-function Brick:destroy()
-	display.remove(self)
-	-- sometimes need to use self:removeSelf() depending on object type (text)
-	-- self = nil -- would this cause a crash?
 end
 
 local function createBrick(group, x, y, width, height)
@@ -40,7 +41,7 @@ local function createBrick(group, x, y, width, height)
 	brick.type = "brick"
 	physics.addBody(brick, "static")
 
-	setmetatable(brick, { __index = Brick })
+	brick:addEventListener("collision", onCollision)
 
 	return brick
 end

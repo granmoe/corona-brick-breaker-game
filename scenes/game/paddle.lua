@@ -6,13 +6,12 @@ local function dragPaddle(event)
 	if ("began" == event.phase) then
 		paddle.touchOffsetX = event.x - paddle.x
 		display.currentStage:setFocus(paddle)
-	-- Set touch focus on the paddle
-	-- Store initial offset position
+	-- Store initial offset position and set touch focus on paddle
 	elseif ("moved" == event.phase) then
-		-- Move the paddle to the new touch position
+		-- Move paddle to the new touch position
 		paddle.x = event.x - paddle.touchOffsetX
 	elseif ("ended" == event.phase or "cancelled" == event.phase) then
-		-- Release touch focus on the paddle
+		-- Release touch focus on paddle
 		display.currentStage:setFocus(nil)
 	end
 

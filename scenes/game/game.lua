@@ -28,13 +28,24 @@ function scene:create(event)
 	background.y = cy
 	background.fill.effect = "filter.crystallize"
 	background.fill.effect.numTiles = 90 -- 140
+	-- Add walls
+	local ceiling = display.newRect(cx, -10, cw, 10)
+	local leftWall = display.newRect(-10, cy, 10, ch)
+	local rightWall = display.newRect(cw, cy, 10, ch)
+	physics.addBody(ceiling, "static")
+	physics.addBody(leftWall, "static")
+	physics.addBody(rightWall, "static")
+	ceiling:setFillColor(0, 0, 0)
+	leftWall:setFillColor(0, 0, 0)
+	rightWall:setFillColor(0, 0, 0)
+
 	-- Add bricks
-	local width = cw / 6
+	local width = cw / 7
 	local height = 20
 	local startX = width / 2
 	local startY = 30
 	for row = 0, 2 do
-		for col = 0, 5 do
+		for col = 0, 6 do
 			local x = startX + col * width
 			local y = startY + row * height
 			createBrick(mainGroup, x, y, width, height)
