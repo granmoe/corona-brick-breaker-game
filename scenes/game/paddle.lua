@@ -18,6 +18,24 @@ local function dragPaddle(event)
 	return true -- Prevents touch propagation to underlying objects
 end
 
+local function key(event)
+	print"it worked"
+	print(event.target)
+	-- if (event.phase == lastEvent.phase) and (event.keyName == lastEvent.keyName) then
+	-- 	return false
+	-- end -- Filter repeating keys
+	if event.phase == "down" then
+		if "left" == event.keyName or "a" == event.keyName then
+			-- event.target:applyForce(0, 0, -50, -50)
+		end
+		if "right" == event.keyName or "d" == event.keyName then
+			-- event.target:applyForce(0, 0, 50, 50)
+		end
+	end
+
+	-- lastEvent = event
+end
+
 local function createPaddle(group)
 	local paddle =
 		display.newRect(
@@ -27,10 +45,12 @@ local function createPaddle(group)
 			85,
 			20
 		)
-	physics.addBody(paddle, "static", {
+	physics.addBody(paddle, "dynamic", {
+		density = 100000,
 		friction = 0.9,
-		bounce = 1
+		bounce = 0
 	})
+
 	paddle.type = "paddle"
 	paddle.fill.effect = "generator.radialGradient"
 	paddle.fill.effect.color1 = { 1, 1, 1, 1 }
@@ -39,6 +59,23 @@ local function createPaddle(group)
 	paddle.fill.effect.aspectRatio = 0.1
 
 	paddle:addEventListener("touch", dragPaddle)
+
+	-- TODO: Figure out a better way to do this that will still have instance in scope
+	Runtime:addEventListener("key", function(event)
+		print(event.phase)
+		print(event.keyName)
+		if event.phase == "down" then
+			if "left" == event.keyName then
+				paddle:setLinearVelocity(-300, 0)
+			end
+			if "right" == event.keyName then
+				paddle:setLinearVelocity(300, 0)
+			end
+		end
+		if event.phase == "up" then
+			paddle:setLinearVelocity(0, 0)
+		end
+	end)
 
 	return paddle
 end
