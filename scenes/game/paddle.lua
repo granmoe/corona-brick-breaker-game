@@ -1,4 +1,5 @@
 local physics = require("physics")
+keysDown = require("keys-down")
 
 local function dragPaddle(event)
 	local paddle = event.target
@@ -16,24 +17,6 @@ local function dragPaddle(event)
 	end
 
 	return true -- Prevents touch propagation to underlying objects
-end
-
-local function key(event)
-	print"it worked"
-	print(event.target)
-	-- if (event.phase == lastEvent.phase) and (event.keyName == lastEvent.keyName) then
-	-- 	return false
-	-- end -- Filter repeating keys
-	if event.phase == "down" then
-		if "left" == event.keyName or "a" == event.keyName then
-			-- event.target:applyForce(0, 0, -50, -50)
-		end
-		if "right" == event.keyName or "d" == event.keyName then
-			-- event.target:applyForce(0, 0, 50, 50)
-		end
-	end
-
-	-- lastEvent = event
 end
 
 local function createPaddle(group)
@@ -59,20 +42,22 @@ local function createPaddle(group)
 	paddle.fill.effect.aspectRatio = 0.1
 
 	paddle:addEventListener("touch", dragPaddle)
-
-	-- TODO: Figure out a better way to do this that will still have instance in scope
+	paddle:addEventListener("touch", dragPaddle)
+	
 	Runtime:addEventListener("key", function(event)
-		print(event.phase)
-		print(event.keyName)
-		if event.phase == "down" then
-			if "left" == event.keyName then
-				paddle:setLinearVelocity(-300, 0)
-			end
-			if "right" == event.keyName then
-				paddle:setLinearVelocity(300, 0)
-			end
+		if event.phase ~= 'down' then return end
+
+		if event.keyName == 'left' then
+			paddle:setLinearVelocity(-300, 0)
 		end
-		if event.phase == "up" then
+
+		if event.keyName == 'right' then
+			paddle:setLinearVelocity(300, 0)
+		end
+	end)
+
+	Runtime:addEventListener('enterFrame', function()
+		if not keysDown['left'] and not keysDown['right'] then
 			paddle:setLinearVelocity(0, 0)
 		end
 	end)

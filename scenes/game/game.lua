@@ -29,9 +29,9 @@ function scene:create(event)
 	background.fill.effect = "filter.crystallize"
 	background.fill.effect.numTiles = 90 -- 140
 	-- Add walls
-	local ceiling = display.newRect(cx, -10, cw, 10)
-	local leftWall = display.newRect(-10, cy, 10, ch)
-	local rightWall = display.newRect(cw, cy, 10, ch)
+	local ceiling = display.newRect(cx, -5, cw, 10)
+	local leftWall = display.newRect(-5, cy, 10, ch)
+	local rightWall = display.newRect(cw + 5, cy, 10, ch)
 	physics.addBody(ceiling, "static", { bounce = 0 })
 	physics.addBody(leftWall, "static", { bounce = 0 })
 	physics.addBody(rightWall, "static", { bounce = 0 })
