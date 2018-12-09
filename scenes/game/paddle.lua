@@ -11,6 +11,12 @@ local function dragPaddle(event)
 	elseif ("moved" == event.phase) then
 		-- Move paddle to the new touch position
 		paddle.x = event.x - paddle.touchOffsetX
+		if paddle.x < paddle.width / 2 then
+			paddle.x = paddle.width / 2
+		end
+		if paddle.x > display.contentWidth - paddle.width / 2 then
+			paddle.x = display.contentWidth - paddle.width / 2
+		end
 	elseif ("ended" == event.phase or "cancelled" == event.phase) then
 		-- Release touch focus on paddle
 		display.currentStage:setFocus(nil)

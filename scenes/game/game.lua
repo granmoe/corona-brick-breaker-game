@@ -68,7 +68,18 @@ function scene:create(event)
 		friction = 0.5,
 		bounce = 1
 	})
+
 	ball:setLinearVelocity(0, 200)
+
+	Runtime:addEventListener('enterFrame', function()
+		local limitedVx, limitedVy = ball:getLinearVelocity()
+		if limitedVx < -200 then limitedVx = -200 end
+		if limitedVx > 200 then limitedVx = 200 end
+		if limitedVy < -200 then limitedVy = -200 end
+		if limitedVy > 200 then limitedVy = 200 end
+
+		ball:setLinearVelocity(limitedVx, limitedVy)
+	end)
 end
 
 function scene:show(event)
