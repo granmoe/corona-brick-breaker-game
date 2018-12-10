@@ -48,24 +48,31 @@ local function createPaddle(group)
 	paddle.fill.effect.aspectRatio = 0.1
 
 	paddle:addEventListener("touch", dragPaddle)
-	paddle:addEventListener("touch", dragPaddle)
 	
-	Runtime:addEventListener("key", function(event)
+	local function onKey(event)
 		if event.phase ~= 'down' then return end
-
+		
 		if event.keyName == 'left' then
 			paddle:setLinearVelocity(-300, 0)
 		end
-
+		
 		if event.keyName == 'right' then
 			paddle:setLinearVelocity(300, 0)
 		end
-	end)
+	end
+	Runtime:addEventListener("key", onKey)
 
-	Runtime:addEventListener('enterFrame', function()
+	local function onEnterFrame()
 		if not keysDown['left'] and not keysDown['right'] then
 			paddle:setLinearVelocity(0, 0)
 		end
+	end
+	Runtime:addEventListener('enterFrame', onEnterFrame)
+
+	paddle:addEventListener("finalize", function(event)
+		paddle:removeEventListener("touch", dragPaddle)
+		Runtime:removeEventListener("key", onKey)
+		Runtime:removeEventListener("enterFrame", onEnterFrame)
 	end)
 
 	return paddle

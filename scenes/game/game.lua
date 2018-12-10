@@ -40,6 +40,7 @@ function scene:create(event)
 	rightWall:setFillColor(0, 0, 0)
 
 	-- Add bricks
+	local bricks = {}
 	local width = cw / 7
 	local height = 20
 	local startX = width / 2
@@ -48,7 +49,7 @@ function scene:create(event)
 		for col = 0, 6 do
 			local x = startX + col * width
 			local y = startY + row * height
-			createBrick(mainGroup, x, y, width, height)
+			local brick = createBrick(mainGroup, x, y, width, height, bricks)
 		end
 	end
 
@@ -71,7 +72,12 @@ function scene:create(event)
 
 	ball:setLinearVelocity(0, 200)
 
-	Runtime:addEventListener('enterFrame', function()
+	function removeEventListeners()
+		Runtime:removeEventListener('enterFrame', updateBall)
+		Runtime:removeEventListener('enterFrame', checkBrickCount)
+	end
+
+	local function updateBall()
 		local limitedVx, limitedVy = ball:getLinearVelocity()
 		if limitedVx < -200 then limitedVx = -200 end
 		if limitedVx > 200 then limitedVx = 200 end
@@ -79,7 +85,26 @@ function scene:create(event)
 		if limitedVy > 200 then limitedVy = 200 end
 
 		ball:setLinearVelocity(limitedVx, limitedVy)
-	end)
+		if ball.y > ch - ball.width / 2 then
+			composer.setVariable('state', 'lost')
+			composer.gotoScene('scenes.menu.menu')
+			removeEventListeners()
+		end
+	end
+
+	Runtime:addEventListener('enterFrame', updateBall)
+
+	local function checkBrickCount()
+		local numBricks = 0
+		for _ in pairs(bricks) do numBricks = numBricks + 1 end
+		if numBricks == 0 then
+			composer.setVariable('state', 'won')
+			composer.gotoScene('scenes.menu.menu')
+			removeEventListeners()
+		end
+	end
+
+	Runtime:addEventListener('enterFrame', checkBrickCount)
 end
 
 function scene:show(event)
@@ -91,7 +116,7 @@ end
 function scene:hide(event)
 	if (event.phase == "did") then
 		physics.pause()
-		composer.removeScene("game")
+		composer.removeScene("scenes.game.game")
 	end
 end
 

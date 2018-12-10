@@ -22,7 +22,7 @@ function onCollision(event)
 	end
 end
 
-local function createBrick(group, x, y, width, height)
+local function createBrick(group, x, y, width, height, bricks)
 	-- last arg is border radius
 	local brick = display.newRect(group, x, y, width, height)
 	local r, b, g =
@@ -42,6 +42,13 @@ local function createBrick(group, x, y, width, height)
 	physics.addBody(brick, "static")
 
 	brick:addEventListener("collision", onCollision)
+	brick:addEventListener("finalize", function(event)
+		brick:removeEventListener("collision", onCollision)
+		bricks[brick] = nil
+	end)
+
+	brick.bricks = bricks
+	bricks[brick] = brick
 
 	return brick
 end
